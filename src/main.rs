@@ -1,18 +1,21 @@
 use clap::Parser;
 use kerberust::arguments::*;
+use kerberust::helpers::BANNER;
 
 fn main() {
     let cli = Arguments::parse();
 
+    println!("{}", BANNER);
+
     match cli.mode {
         Mode::Userbrute(args) => {
-            todo!()
+            kerberust::userbrute::start(args);
         }
         Mode::Stringtokey(args) => {
-            todo!()
+            kerberust::stringtokey::start(args);
         }
         Mode::Asktgt(args) => {
-            todo!()
+            kerberust::asktgt::start(args);
         }
     }
 }
