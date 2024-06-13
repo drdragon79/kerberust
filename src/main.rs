@@ -5,17 +5,16 @@ use kerberust::helpers::BANNER;
 fn main() {
     let cli = Arguments::parse();
 
-    println!("{}", BANNER);
+    if !cli.nobanner {
+        println!("{}", BANNER);
+    }
 
     match cli.mode {
-        Mode::Userbrute(args) => {
-            kerberust::userbrute::start(args);
+        Mode::Userenum(args) => {
+            kerberust::userenum::start(args);
         }
         Mode::Stringtokey(args) => {
             kerberust::stringtokey::start(args);
-        }
-        Mode::Asktgt(args) => {
-            kerberust::asktgt::start(args);
         }
     }
 }

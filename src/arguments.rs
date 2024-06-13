@@ -3,136 +3,94 @@ use clap::{
     Subcommand,
     Args
 };
-use std::{error::Error, net::Ipv4Addr};
+use std::net::Ipv4Addr;
 use hex;
 
 #[derive(Parser)]
 #[command(version, about)]
 pub struct Arguments {
-    /// Module to run
+    /// Module to execute
     #[command(subcommand)]
     pub mode: Mode,
 
-    /// Set verbosity of the output
-    #[arg(long, short, action = clap::ArgAction::Count)]
-    pub verbose: u8
+    // #[arg(long, short, action = clap::ArgAction::Count)]
+    // pub verbose: u8,
+
+    /// Dont print Kerberust banner
+    #[arg(long, default_value_t = false)]
+    pub nobanner: bool
 }
 
 #[derive(Subcommand)]
 pub enum Mode {
-    Userbrute(UserbruteArgs),
+    Userenum(UserenumArgs),
     Stringtokey(StringtokeyArgs),
-    Asktgt(AsktgtArgs)
 }
-// USER BRUTE ARGS ##############################################
+
+// USER ENUM ARGS
 #[derive(Args)]
-pub struct UserbruteArgs {
+pub struct UserenumArgs {
     /// IP Address of the domain controller
     #[arg(long, short, value_parser = validate_ip)]
-    pub ip: String,
+    pub ip: Option<String>,
 
-    /// Domain name
+    /// Target domain name
     #[arg(long, short, value_parser = validate_ascii)]
     pub domain: String,
 
     #[command(flatten)]
     pub username: Username,
 
-    /// Specify threads
+    /// Number of parallel threads
     #[arg(long, short, default_value_t = 2)]
     pub threads: usize,
 
+    /// Dump AS-REP hash for users that lack kerberos preauthentication
     #[arg(long)]
-    pub npauth: bool
+    pub npauth: bool,
+
+    /// Do no negotiate RC4-HMAC etype.
+    #[arg(long)]
+    pub opsec: bool
 }
 
 #[derive(Args)]
 #[group(required = true, multiple = false)]
 pub struct Username {
-    /// Check validity of a single username
+    /// Single username
     #[arg(long, value_parser = validate_ascii)]
     pub username: Option<String>,
 
-    /// Get usernames from a file
+    /// Username file
     #[arg(long)]
     pub userlist: Option<String>
 }
 
-// STRING TO KEY ARGS ##############################################
+// STRING TO KEY ARGS
 #[derive(Args)]
 pub struct StringtokeyArgs {
     /// Password of the user
     #[arg(long, short)]
     pub password: String,
 
-    /// Optional salt for the domain. If salt is not provided, it will be fetched from the pre-auth request
+    /// Salt for the user
     #[arg(long, short)]
     pub salt: String,
 
+    /// Optional iteration value for AES PBKDF2 computation. Default value = 4096
     #[arg(long, short)]
     pub iteration: Option<u32>,
-
-    #[command(flatten)]
-    pub keytype: StringtokeyArgsKeytypeArgs
 }
-
-#[derive(Args)]
-#[group(required = true, multiple = true)]
-pub struct StringtokeyArgsKeytypeArgs {
-    /// AES156 Key for the password
-    #[arg(long)]
-    pub aes256: bool,
-
-    /// AES128 Key for the password
-    #[arg(long)]
-    pub aes128: bool
-}
-
-
-
-// ASKTGT ARGS ##############################################
-#[derive(Args)]
-pub struct AsktgtArgs {
-    /// IP Address of the domain controller
-    #[arg(long, short, value_parser = validate_ip)]
-    pub ip: String,
-
-    /// Domain name
-    #[arg(long, short)]
-    pub domain: Option<String>,
-
-    /// username
-    #[arg(long, short, value_parser = validate_ascii)]
-    pub username: String,
-
-    #[command(flatten)]
-    pub key: Keyfortgt
-}
-
-#[derive(Args)]
-#[group(required = true , multiple = false)]
-pub struct Keyfortgt {
-    /// AES256 Key of the user
-    #[arg(long, value_parser = validate_aes256)]
-    pub aes256: Option<String>,
-
-    /// AES128 Key of the user
-    #[arg(long, value_parser = validate_aes128)]
-    pub aes128: Option<String>,
-
-    /// Password for the user
-    #[arg(long)]
-    pub password: Option<String>,
-}
-
 
 // VALIDATORS
+/// IP Address validator
 fn validate_ip(s: &str) -> Result<String, String> {
     let _ip = s.parse::<Ipv4Addr>()
         .map_err(|_| "Invalid IP Address!".to_string())?;
     Ok(s.to_string())
 }
 
+/// AES128 key validator
 fn validate_aes128(s: &str) -> Result<String, String> {
     let decoded = hex::decode(s)
         .map_err(|e| format!("Invalid hex value: [{e}]"))?;
@@ -143,6 +101,7 @@ fn validate_aes128(s: &str) -> Result<String, String> {
     }
 }
 
+/// AES256 key validator
 fn validate_aes256(s: &str) -> Result<String, String> {
     let decoded = hex::decode(s)
         .map_err(|e| format!("Invalid hex value [{e}]"))?;
@@ -153,6 +112,7 @@ fn validate_aes256(s: &str) -> Result<String, String> {
     }
 }
 
+/// ASCII string validator
 fn validate_ascii(s: &str) -> Result<String, String> {
      if s
         .chars()

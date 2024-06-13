@@ -1,9 +1,7 @@
 pub mod arguments;
 
-pub mod userbrute;
+pub mod userenum;
 
 pub mod stringtokey;
-
-pub mod asktgt;
 
 pub mod helpers;
