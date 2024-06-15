@@ -10,7 +10,7 @@ Current capabilites:
 - userenum
 - string2key
 ### userenum
-`userenum` module can be used to enumerate valid users in a domain. It can enumerate users with kerberos pre-authentication disabled, and optionally dump AS-REP hash, that can be cracked using `john` or `hashcat`. `kerberus` will try to resolve the supplied domain, but in case it is not able to, ip address needs to be supplied using the `--ip` option.
+`userenum` module can be used to enumerate valid users in a domain. It can enumerate users with kerberos pre-authentication disabled, and optionally dump AS-REP hash, that can be cracked using `john` or `hashcat`. `kerberust` will try to resolve the supplied domain, but in case it is not able to, ip address needs to be supplied using the `--ip` option.
 ```bash 
 # Check validity of a single user
 kerberust userenum --domain DOMAIN.local --username Administrator
