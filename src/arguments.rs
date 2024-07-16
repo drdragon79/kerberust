@@ -1,10 +1,6 @@
-use clap::{
-    Parser,
-    Subcommand,
-    Args
-};
-use std::net::Ipv4Addr;
+use clap::{Args, Parser, Subcommand};
 use hex;
+use std::net::Ipv4Addr;
 
 #[derive(Parser)]
 #[command(version, about)]
@@ -15,10 +11,9 @@ pub struct Arguments {
 
     // #[arg(long, short, action = clap::ArgAction::Count)]
     // pub verbose: u8,
-
     /// Dont print Kerberust banner
     #[arg(long, default_value_t = false)]
-    pub nobanner: bool
+    pub nobanner: bool,
 }
 
 #[derive(Subcommand)]
@@ -51,7 +46,7 @@ pub struct UserenumArgs {
 
     /// Do no negotiate RC4-HMAC etype.
     #[arg(long)]
-    pub opsec: bool
+    pub opsec: bool,
 }
 
 #[derive(Args)]
@@ -63,7 +58,7 @@ pub struct Username {
 
     /// Username file
     #[arg(long)]
-    pub userlist: Option<String>
+    pub userlist: Option<String>,
 }
 
 // STRING TO KEY ARGS
@@ -85,15 +80,15 @@ pub struct StringtokeyArgs {
 // VALIDATORS
 /// IP Address validator
 fn validate_ip(s: &str) -> Result<String, String> {
-    let _ip = s.parse::<Ipv4Addr>()
+    let _ip = s
+        .parse::<Ipv4Addr>()
         .map_err(|_| "Invalid IP Address!".to_string())?;
     Ok(s.to_string())
 }
 
 /// AES128 key validator
 fn validate_aes128(s: &str) -> Result<String, String> {
-    let decoded = hex::decode(s)
-        .map_err(|e| format!("Invalid hex value: [{e}]"))?;
+    let decoded = hex::decode(s).map_err(|e| format!("Invalid hex value: [{e}]"))?;
     if decoded.len() != 16 {
         Err("Invalid key length!".to_string())
     } else {
@@ -103,8 +98,7 @@ fn validate_aes128(s: &str) -> Result<String, String> {
 
 /// AES256 key validator
 fn validate_aes256(s: &str) -> Result<String, String> {
-    let decoded = hex::decode(s)
-        .map_err(|e| format!("Invalid hex value [{e}]"))?;
+    let decoded = hex::decode(s).map_err(|e| format!("Invalid hex value [{e}]"))?;
     if decoded.len() != 32 {
         Err("Invalid key length!".to_string())
     } else {
@@ -114,9 +108,7 @@ fn validate_aes256(s: &str) -> Result<String, String> {
 
 /// ASCII string validator
 fn validate_ascii(s: &str) -> Result<String, String> {
-     if s
-        .chars()
-        .all(|x| x.is_ascii()) {
+    if s.chars().all(|x| x.is_ascii()) {
         Ok(s.to_string())
     } else {
         Err("String has non ascii characters!".to_string())

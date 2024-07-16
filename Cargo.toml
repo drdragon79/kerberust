@@ -2,7 +2,10 @@
 name = "kerberust"
 version = "0.0.2"
 edition = "2021"
+authors = ["Akshay <drdragon79@proton.me>"]
 description = "A commandline kerberos protocol attacker"
+license = "MIT"
+keywords = ["kerberos", "protocol", "brute", "sha256", "aes128"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
